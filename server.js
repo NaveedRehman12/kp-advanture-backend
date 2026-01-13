@@ -6,7 +6,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const path = require('path');
 const http = require('http');
-const { Server } = require('socket.io');
+// const { Server } = require('socket.io');
 
 const authRoutes = require('./src/routes/authRoutes');
 const adminRoutes = require('./src/routes/adminRoutes');
@@ -24,15 +24,15 @@ const { errorHandler } = require('./src/middlewares/errorMiddleware');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    }
-});
+// const io = new Server(server, {
+//     cors: {
+//         origin: "*",
+//         methods: ["GET", "POST"]
+//     }
+// });
 
 // Attach io to app for use in controllers
-app.set('io', io);
+// app.set('io', io);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -58,18 +58,18 @@ app.use('/api/live-updates', liveUpdateRoutes);
 app.use('/api/notifications', notificationRoutes);
 
 // Socket Logic
-io.on('connection', (socket) => {
-    console.log('User connected:', socket.id);
+// io.on('connection', (socket) => {
+//     console.log('User connected:', socket.id);
 
-    socket.on('join', (userId) => {
-        socket.join(userId);
-        console.log(`User ${userId} joined their room`);
-    });
+//     socket.on('join', (userId) => {
+//         socket.join(userId);
+//         console.log(`User ${userId} joined their room`);
+//     });
 
-    socket.on('disconnect', () => {
-        console.log('User disconnected');
-    });
-});
+//     socket.on('disconnect', () => {
+//         console.log('User disconnected');
+//     });
+// });
 
 // Error Handling
 app.use(errorHandler);
