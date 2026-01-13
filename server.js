@@ -40,6 +40,10 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use('/uploads', express.static(path.join(__dirname, 'src/uploads')));
 
+app.get('/', (req, res) => {
+    res.send('application is up');
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
