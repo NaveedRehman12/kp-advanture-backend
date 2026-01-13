@@ -37,7 +37,7 @@ const server = http.createServer(app);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-app.use(morgan('dev'));
+// app.use(morgan('dev'));
 app.use('/uploads', express.static(path.join(__dirname, 'src/uploads')));
 
 app.get('/', (req, res) => {
@@ -72,7 +72,7 @@ app.use('/api/notifications', notificationRoutes);
 // });
 
 // Error Handling
-app.use(errorHandler);
+// app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
