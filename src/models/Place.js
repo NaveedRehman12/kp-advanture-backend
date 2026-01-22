@@ -11,7 +11,8 @@ const placeSchema = new mongoose.Schema({
     locationText: { type: String, required: true },
     category: { type: String },
     avgRating: { type: Number, default: 0 },
-    reviewCount: { type: Number, default: 0 }
+    reviewCount: { type: Number, default: 0 },
+    safetyTips: [{ type: String }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Place', placeSchema);

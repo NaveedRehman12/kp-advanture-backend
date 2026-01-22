@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Jeep = require('../models/Jeep');
 const Hotel = require('../models/Hotel');
+const Booking = require('../models/Booking');
 
 exports.getDashboardStats = async (req, res, next) => {
     try {
@@ -9,6 +10,7 @@ exports.getDashboardStats = async (req, res, next) => {
         const totalDrivers = await Jeep.countDocuments({});
 
         const totalHotels = await Hotel.countDocuments({});
+        const totalBookings = await Booking.countDocuments({});
 
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -64,6 +66,7 @@ exports.getDashboardStats = async (req, res, next) => {
                 totalDrivers,
                 totalHotels,
                 newHotels,
+                totalBookings,
                 userGrowth: formattedGrowth
             }
         });

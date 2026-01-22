@@ -1,7 +1,12 @@
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const User = require('../models/User');
+const RegistrationOTP = require('../models/RegistrationOTP');
 const sendEmail = require('../utils/sendEmail');
+
+const generateOTP = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+};
 
 const generateTokens = (id) => {
     const accessToken = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.TOKEN_EXPIRES });
@@ -32,6 +37,166 @@ exports.register = async (req, res, next) => {
                 refreshToken
             }
         });
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.sendOtpRegister = async (req, res, next) => {
+    try {
+        const { email } = req.body;
+        const normalizedEmail = email.toLowerCase().trim();
+        console.log('Registration OTP requested for:', normalizedEmail);
+
+        const userExists = await User.findOne({ email: normalizedEmail });
+        if (userExists) {
+            console.log('Registration failed: User already exists:', normalizedEmail);
+            return res.status(400).json({ success: false, message: 'User already exists' });
+        }
+
+        const otp = generateOTP();
+
+        await RegistrationOTP.deleteOne({ email }); // Clear invalid previous OTPs
+        await RegistrationOTP.create({ email, otp });
+
+        try {
+            console.log('Attempting to send registration email to:', normalizedEmail);
+            await sendEmail({
+                email: normalizedEmail,
+                subject: 'Tourism Platform Registration OTP',
+                message: `Your OTP for registration is: ${otp}. It expires in 10 minutes.`,
+            });
+            console.log('Registration email sent successfully');
+            res.json({ success: true, message: 'OTP sent to email' });
+        } catch (err) {
+            console.error('Email send failed (Expected if no SMTP Configured).');
+            console.log('---------------------------------------------------');
+            console.log('DEV MODE - YOUR REGISTRATION OTP IS:', otp);
+            console.log('---------------------------------------------------');
+            res.json({ success: true, message: 'OTP sent (stub)', devOtp: otp });
+        }
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.verifyOtpRegister = async (req, res, next) => {
+    try {
+        const { name, email, password, phone, otp } = req.body;
+        const normalizedEmail = email.toLowerCase().trim();
+
+        const record = await RegistrationOTP.findOne({ email: normalizedEmail, otp });
+        if (!record) {
+            return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
+        }
+
+        const userExists = await User.findOne({ email: normalizedEmail });
+        if (userExists) {
+            return res.status(400).json({ success: false, message: 'User already exists' });
+        }
+
+        const user = await User.create({ name, email: normalizedEmail, password, phone });
+        const { accessToken, refreshToken } = generateTokens(user._id);
+        user.refreshToken = refreshToken;
+        await user.save();
+
+        await RegistrationOTP.deleteOne({ _id: record._id });
+
+        res.status(201).json({
+            success: true,
+            data: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                accessToken,
+                refreshToken
+            }
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.sendOtpLogin = async (req, res, next) => {
+    try {
+        const { email } = req.body;
+        console.log('Login OTP requested for:', email);
+        // Case-insensitive lookup
+        const user = await User.findOne({ email: email.toLowerCase().trim() });
+        if (!user) {
+            console.log('User not found for email:', email);
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        const otp = generateOTP();
+        user.otp = otp;
+        user.otpExpires = Date.now() + 10 * 60 * 1000;
+
+        try {
+            await user.save();
+        } catch (saveErr) {
+            console.error('Failed to save OTP to user record:', saveErr);
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+
+        try {
+            console.log('Attempting to send email to:', email);
+            await sendEmail({
+                email,
+                subject: 'Tourism Platform Login OTP',
+                message: `Your OTP for login is: ${otp}`,
+            });
+            console.log('Email sent successfully');
+            res.json({ success: true, message: 'OTP sent' });
+        } catch (err) {
+            console.error('Email send failed (Expected if no SMTP Configured).');
+            console.log('---------------------------------------------------');
+            console.log('DEV MODE - YOUR LOGIN OTP IS:', otp);
+            console.log('---------------------------------------------------');
+            // STILL RETURN SUCCESS so the user can use the console OTP
+            res.json({ success: true, message: 'OTP sent (Check Console)', devOtp: otp });
+        }
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.verifyOtpLogin = async (req, res, next) => {
+    try {
+        const { email, otp } = req.body;
+        const normalizedEmail = email.toLowerCase().trim();
+        const user = await User.findOne({
+            email: normalizedEmail,
+            otp,
+            otpExpires: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
+        }
+
+        user.otp = undefined;
+        user.otpExpires = undefined;
+
+        const { accessToken, refreshToken } = generateTokens(user._id);
+        user.refreshToken = refreshToken;
+        await user.save();
+
+        res.json({
+            success: true,
+            data: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                accessToken,
+                refreshToken
+            }
+        });
+
     } catch (error) {
         next(error);
     }
@@ -127,6 +292,10 @@ exports.updateProfile = async (req, res, next) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                phone: user.phone,
+                emergencyPhone: user.emergencyPhone,
+                homeAddress: user.homeAddress,
+                city: user.city,
                 profileImage: user.profileImage
             }
         });

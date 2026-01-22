@@ -16,8 +16,11 @@ const jeepSchema = new mongoose.Schema({
     driver: {
         name: { type: String },
         phone: { type: String },
-        image: { type: String }
+        image: { type: String },
+        cnic: { type: String },
+        bio: { type: String }
     },
+    features: [{ type: String }],
     contactPhone: { type: String, required: false },
     contactWhatsApp: { type: String },
     avgRating: { type: Number, default: 0 },

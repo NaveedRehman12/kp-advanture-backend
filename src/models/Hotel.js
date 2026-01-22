@@ -10,6 +10,7 @@ const hotelSchema = new mongoose.Schema({
         lng: { type: Number }
     },
     priceRange: { type: String },
+    basePrice: { type: Number },
     contactPhone: { type: String, required: true },
     contactWhatsApp: { type: String },
     totalRooms: { type: Number, default: 0 },

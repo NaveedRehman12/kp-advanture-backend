@@ -19,6 +19,8 @@ const lostFoundRoutes = require('./src/routes/lostFoundRoutes');
 const dashboardRoutes = require('./src/routes/dashboardRoutes');
 const liveUpdateRoutes = require('./src/routes/liveUpdateRoutes');
 const notificationRoutes = require('./src/routes/notificationRoutes');
+const bookingRoutes = require('./src/routes/bookingRoutes');
+const emergencyRoutes = require('./src/routes/emergencyRoutes');
 
 const { errorHandler } = require('./src/middlewares/errorMiddleware');
 
@@ -56,6 +58,8 @@ app.use('/api/lost-found', lostFoundRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/live-updates', liveUpdateRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/bookings', bookingRoutes);
+app.use('/api/emergency', emergencyRoutes);
 
 // Socket Logic
 // io.on('connection', (socket) => {

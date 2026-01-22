@@ -5,13 +5,13 @@ const sendEmail = async (options) => {
         host: process.env.SMTP_HOST,
         port: process.env.SMTP_PORT,
         auth: {
-            user: process.env.SMTP_EMAIL,
+            user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASSWORD,
         },
     });
 
     const message = {
-        from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
+        from: `${process.env.SMTP_FROM_NAME} <${process.env.SMTP_USER}>`,
         to: options.email,
         subject: options.subject,
         text: options.message,
