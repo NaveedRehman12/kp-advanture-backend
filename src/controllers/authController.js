@@ -33,6 +33,11 @@ exports.register = async (req, res, next) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                phone: user.phone,
+                emergencyPhone: user.emergencyPhone,
+                homeAddress: user.homeAddress,
+                city: user.city,
+                profileImage: user.profileImage,
                 accessToken,
                 refreshToken
             }
@@ -110,6 +115,11 @@ exports.verifyOtpRegister = async (req, res, next) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                phone: user.phone,
+                emergencyPhone: user.emergencyPhone,
+                homeAddress: user.homeAddress,
+                city: user.city,
+                profileImage: user.profileImage,
                 accessToken,
                 refreshToken
             }
@@ -192,6 +202,11 @@ exports.verifyOtpLogin = async (req, res, next) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                phone: user.phone,
+                emergencyPhone: user.emergencyPhone,
+                homeAddress: user.homeAddress,
+                city: user.city,
+                profileImage: user.profileImage,
                 accessToken,
                 refreshToken
             }
@@ -218,6 +233,11 @@ exports.login = async (req, res, next) => {
                     name: user.name,
                     email: user.email,
                     role: user.role,
+                    phone: user.phone,
+                    emergencyPhone: user.emergencyPhone,
+                    homeAddress: user.homeAddress,
+                    city: user.city,
+                    profileImage: user.profileImage,
                     accessToken,
                     refreshToken
                 }
