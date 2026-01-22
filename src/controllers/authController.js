@@ -205,7 +205,8 @@ exports.verifyOtpLogin = async (req, res, next) => {
 exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
-        const user = await User.findOne({ email });
+        const normalizedEmail = email?.toLowerCase().trim();
+        const user = await User.findOne({ email: normalizedEmail });
         if (user && (await user.comparePassword(password))) {
             const { accessToken, refreshToken } = generateTokens(user._id);
             user.refreshToken = refreshToken;
