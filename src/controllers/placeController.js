@@ -32,7 +32,7 @@ exports.getPlace = async (req, res, next) => {
 
 exports.createPlace = async (req, res, next) => {
     try {
-        const images = req.files ? req.files.map(f => `/uploads/${f.filename}`) : [];
+        const images = req.files ? req.files.map(f => f.path) : [];
         const place = await Place.create({ ...req.body, images, gps: JSON.parse(req.body.gps) });
         res.status(201).json({ success: true, data: place });
     } catch (error) {
@@ -44,7 +44,7 @@ exports.updatePlace = async (req, res, next) => {
     try {
         let updateData = { ...req.body };
         if (req.files && req.files.length > 0) {
-            updateData.images = req.files.map(f => `/uploads/${f.filename}`);
+            updateData.images = req.files.map(f => f.path);
         }
         if (req.body.gps) updateData.gps = JSON.parse(req.body.gps);
 

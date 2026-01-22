@@ -281,7 +281,7 @@ exports.updateProfile = async (req, res, next) => {
         if (req.body.city) user.city = req.body.city;
 
         if (req.file) {
-            user.profileImage = `/uploads/${req.file.filename}`;
+            user.profileImage = req.file.path;
         }
 
         await user.save();

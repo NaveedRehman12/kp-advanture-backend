@@ -31,12 +31,12 @@ exports.createJeep = async (req, res, next) => {
     try {
 
         const images = req.files && req.files['images']
-            ? req.files['images'].map(f => `/uploads/${f.filename}`)
+            ? req.files['images'].map(f => f.path)
             : [];
 
 
         const driverImage = req.files && req.files['driverImage'] && req.files['driverImage'][0]
-            ? `/uploads/${req.files['driverImage'][0].filename}`
+            ? req.files['driverImage'][0].path
             : null;
 
         const driver = {
@@ -66,11 +66,11 @@ exports.updateJeep = async (req, res, next) => {
         if (!existingJeep) return res.status(404).json({ success: false, message: 'Jeep not found' });
 
         if (req.files && req.files['images']) {
-            updateData.images = req.files['images'].map(f => `/uploads/${f.filename}`);
+            updateData.images = req.files['images'].map(f => f.path);
         }
 
         const driverImage = req.files && req.files['driverImage'] && req.files['driverImage'][0]
-            ? `/uploads/${req.files['driverImage'][0].filename}`
+            ? req.files['driverImage'][0].path
             : existingJeep.driver?.image;
 
         updateData.driver = {

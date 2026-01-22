@@ -2,7 +2,7 @@ const LostFound = require('../models/LostFound');
 
 exports.createLostFound = async (req, res, next) => {
     try {
-        const images = req.files ? req.files.map(f => `/uploads/${f.filename}`) : [];
+        const images = req.files ? req.files.map(f => f.path) : [];
         const lostFound = await LostFound.create({
             ...req.body,
             userId: req.user._id,
